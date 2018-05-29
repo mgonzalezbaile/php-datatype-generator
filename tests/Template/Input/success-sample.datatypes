@@ -1,0 +1,4 @@
+namespace Mgonzalezbaile\PdgTest\Template\Output;
+
+data ComplexClass = ComplexClass { string $id, int $otherThing, ?int $nullable, string[] $lastThing } deriving (ComplexClassType);
+data MyValueObject = MyValueObject { string $id, int $otherThing, ?int $nullable, string[] $lastThing } deriving (ValueObjectType);

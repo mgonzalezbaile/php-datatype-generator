@@ -1,0 +1,4 @@
+sudo: true
+
+script:
+  - if [[ $TRAVIS_PULL_REQUEST -ne 'false' ]]; then ./scripts/pr-pipeline.sh ; fi
