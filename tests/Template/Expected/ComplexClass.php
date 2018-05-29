@@ -14,7 +14,6 @@ final class ComplexClass extends ExtensibleClass implements InterfaceClass, Anot
 {
     use SomeTrait;
     use AnotherTrait;
-
     public const someKey1 = "someValue1";
     public const someKey2 = "someValue2";
     private const someKey3 = 5;
@@ -33,17 +32,27 @@ final class ComplexClass extends ExtensibleClass implements InterfaceClass, Anot
     /**
      * @var string
      */
-    protected $privateAttr1 = "hello";
+    private $privateAttr1 = "hello";
 
     /**
      * @var int
      */
-    protected $privateAttr2 = 5;
+    private $privateAttr2 = 5;
 
     /**
      * @var int
      */
-    protected $privateAttr3;
+    private $privateAttr3;
+
+    /**
+     * @var int|null
+     */
+    private $nullablePrivateAttr4;
+
+    /**
+     * @var string[]
+     */
+    private $listPrivateAttr5;
 
     /**
      * @var string
@@ -93,6 +102,31 @@ final class ComplexClass extends ExtensibleClass implements InterfaceClass, Anot
         return $this->lastThing;
     }
 
+    public function privateAttr1(): string
+    {
+        return $this->privateAttr1;
+    }
+
+    public function privateAttr2(): int
+    {
+        return $this->privateAttr2;
+    }
+
+    public function privateAttr3(): int
+    {
+        return $this->privateAttr3;
+    }
+
+    public function nullablePrivateAttr4(): ?int
+    {
+        return $this->nullablePrivateAttr4;
+    }
+
+    public function listPrivateAttr5(): array
+    {
+        return $this->listPrivateAttr5;
+    }
+
     public function withId(string $id): self
     {
         $new      = clone $this;
@@ -121,6 +155,46 @@ final class ComplexClass extends ExtensibleClass implements InterfaceClass, Anot
     {
         $new             = clone $this;
         $this->lastThing = $lastThing;
+
+        return $new;
+    }
+
+    public function withPrivateAttr1(string $privateAttr1): self
+    {
+        $new                = clone $this;
+        $this->privateAttr1 = $privateAttr1;
+
+        return $new;
+    }
+
+    public function withPrivateAttr2(int $privateAttr2): self
+    {
+        $new                = clone $this;
+        $this->privateAttr2 = $privateAttr2;
+
+        return $new;
+    }
+
+    public function withPrivateAttr3(int $privateAttr3): self
+    {
+        $new                = clone $this;
+        $this->privateAttr3 = $privateAttr3;
+
+        return $new;
+    }
+
+    public function withNullablePrivateAttr4(?int $nullablePrivateAttr4): self
+    {
+        $new                        = clone $this;
+        $this->nullablePrivateAttr4 = $nullablePrivateAttr4;
+
+        return $new;
+    }
+
+    public function withListPrivateAttr5(array $listPrivateAttr5): self
+    {
+        $new                    = clone $this;
+        $this->listPrivateAttr5 = $listPrivateAttr5;
 
         return $new;
     }
