@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Mgonzalezbaile\PdgTest\Template\Output;
 
 use \Some\YetAnother\CustomNamespace\UsedClass;
+use function \Some\CustomNamespace\myfunction;
 use \Some\CustomNamespace\InterfaceClass;
 use \Some\CustomNamespace\AnotherInterfaceClass;
 use \Some\Other\CustomNamespace\ExtensibleClass;
@@ -197,5 +198,15 @@ final class ComplexClass extends ExtensibleClass implements InterfaceClass, Anot
         $this->listPrivateAttr5 = $listPrivateAttr5;
 
         return $new;
+    }
+
+    public function someCustomMethod(string $param1): string
+    {
+        return $param1;
+    }
+
+    public function someOtherCustomMethod(): string
+    {
+        return $this->id;
     }
 }
