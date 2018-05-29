@@ -8,6 +8,33 @@ use Mgonzalezbaile\Pdg\Parser\Constructor;
 abstract class ConventionCustomClass
 {
     /**
+     * @var Constructor
+     */
+    private $constructor;
+
+    protected function constructor(): Constructor
+    {
+        return $this->constructor;
+    }
+
+    /**
+     * @return AttributeDefinition[]
+     */
+    protected function allAttributes(): array
+    {
+        return array_merge(
+            $this->protectedAttrs(),
+            $this->privateAttrs(),
+            array_map(
+                function (Argument $argument) {
+                    return AttributeDefinition::fromArgument($argument);
+                },
+                $this->constructor()->arguments()
+            )
+        );
+    }
+
+    /**
      * @return string[]
      */
     protected function uses(): array
@@ -92,6 +119,8 @@ abstract class ConventionCustomClass
 
     public function generate(string $namespace, string $className, Constructor $constructor): string
     {
+        $this->constructor = $constructor;
+
         $text = <<<CODE
         <?php
         declare(strict_types=1);
@@ -212,7 +241,8 @@ CODE;
 
         if (!empty($this->extendClasses())) {
             $text     .= ' extends ';
-            $lastItem = end($this->extendClasses());
+            $extendClasses    = $this->extendClasses();
+            $lastItem = end($extendClasses);
             foreach ($this->extendClasses() as $implementClass) {
                 $implementClassName = explode("\\", $implementClass);
                 $text               .= end($implementClassName);
@@ -224,7 +254,8 @@ CODE;
 
         if (!empty($this->implementClasses())) {
             $text     .= ' implements ';
-            $lastItem = end($this->implementClasses());
+            $implementClasses    = $this->implementClasses();
+            $lastItem = end($implementClasses);
             foreach ($this->implementClasses() as $implementClass) {
                 $implementClassName = explode("\\", $implementClass);
                 $text               .= end($implementClassName);
@@ -241,7 +272,8 @@ CODE;
     {
         $text .= "public function __construct(";
 
-        $lastArgument = end($constructor->arguments());
+        $arguments        = $constructor->arguments();
+        $lastArgument = end($arguments);
         foreach ($constructor->arguments() as $argument) {
             if ($argument->nullable()) {
                 $text .= "?";
