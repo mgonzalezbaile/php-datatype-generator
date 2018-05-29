@@ -8,9 +8,17 @@ use Mgonzalezbaile\Pdg\Parser\Constructor;
 abstract class ConventionCustomClass
 {
     /**
-     * @return UseDefinition[]
+     * @return string[]
      */
     protected function uses(): array
+    {
+        return [];
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function useFunctions(): array
     {
         return [];
     }
@@ -77,6 +85,11 @@ abstract class ConventionCustomClass
     {
     }
 
+    protected function customMethods(): array
+    {
+        return [];
+    }
+
     public function generate(string $namespace, string $className, Constructor $constructor): string
     {
         $text = <<<CODE
@@ -96,6 +109,7 @@ CODE;
         $text = $this->constructorSection($constructor, $text);
         $text = $this->accessorsSection($constructor, $text);
         $text = $this->settersSection($constructor, $text);
+        $text = $this->customMethodsSection($text);
         $text .= "}\n"; //CLOSE CLASS BODY
 
         $this->assertCustomTypeIsValid($constructor);
@@ -107,6 +121,10 @@ CODE;
     {
         foreach ($this->uses() as $item) {
             $text .= "use \\" . $item . ";\n";
+        }
+
+        foreach ($this->useFunctions() as $useFunction) {
+            $text .= "use function\\" . $useFunction . ";\n";
         }
 
         foreach ($this->implementClasses() as $item) {
@@ -309,6 +327,15 @@ CODE;
         $text .= "\$new = clone \$this;";
         $text .= "\$this->" . $argument->name() . " = $" . $argument->name() . ";\n";
         $text .= "return \$new;\n}\n";
+
+        return $text;
+    }
+
+    private function customMethodsSection(string $text): string
+    {
+        foreach ($this->customMethods() as $method) {
+            $text .= $method . "\n";
+        }
 
         return $text;
     }

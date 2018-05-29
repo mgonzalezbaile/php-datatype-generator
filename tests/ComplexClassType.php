@@ -10,7 +10,7 @@ use Mgonzalezbaile\Pdg\Parser\Constructor;
 
 class ComplexClassType extends ConventionCustomClass
 {
-    public function implementClasses(): array
+    protected function implementClasses(): array
     {
         return [
             "Some\CustomNamespace\InterfaceClass",
@@ -18,19 +18,19 @@ class ComplexClassType extends ConventionCustomClass
         ];
     }
 
-    public function classType(): string
+    protected function classType(): string
     {
         return ClassTypeDefinition::TYPE_FINAL_CLASS;
     }
 
-    public function extendClasses(): array
+    protected function extendClasses(): array
     {
         return [
             "Some\Other\CustomNamespace\ExtensibleClass",
         ];
     }
 
-    public function publicConsts(): array
+    protected function publicConsts(): array
     {
         return [
             new ConstDefinition('someKey1', '"someValue1"'),
@@ -38,7 +38,7 @@ class ComplexClassType extends ConventionCustomClass
         ];
     }
 
-    public function privateConsts(): array
+    protected function privateConsts(): array
     {
         return [
             new ConstDefinition('someKey3', '5'),
@@ -46,7 +46,7 @@ class ComplexClassType extends ConventionCustomClass
         ];
     }
 
-    public function protectedAttrs(): array
+    protected function protectedAttrs(): array
     {
         return [
             new AttributeDefinition('protectedAttr1', 'string', false, false, '"hello"'),
@@ -54,12 +54,19 @@ class ComplexClassType extends ConventionCustomClass
         ];
     }
 
-    public function uses(): array
+    protected function uses(): array
     {
         return ["Some\YetAnother\CustomNamespace\UsedClass"];
     }
 
-    public function traits(): array
+    protected function useFunctions(): array
+    {
+        return [
+            "Some\CustomNamespace\myfunction",
+        ];
+    }
+
+    protected function traits(): array
     {
         return [
             "Traits\SomeTrait",
@@ -70,7 +77,7 @@ class ComplexClassType extends ConventionCustomClass
     /**
      * @return AttributeDefinition[]
      */
-    public function privateAttrs(): array
+    protected function privateAttrs(): array
     {
         return [
             new AttributeDefinition('privateAttr1', 'string', false, false, '"hello"'),
@@ -81,7 +88,7 @@ class ComplexClassType extends ConventionCustomClass
         ];
     }
 
-    public function assertCustomTypeIsValid(Constructor $constructor)
+    protected function assertCustomTypeIsValid(Constructor $constructor)
     {
         $idFound = false;
         $count   = 0;
@@ -96,5 +103,33 @@ class ComplexClassType extends ConventionCustomClass
         if (!$idFound) {
             throw new \Exception("'string \$id' should be provided for ComplexClassType as convention");
         }
+    }
+
+    protected function customMethods(): array
+    {
+        return [
+            $this->buildMethod1(),
+            $this->buildMethod2(),
+        ];
+    }
+
+    private function buildMethod1(): string
+    {
+        return <<<CODE
+    public function someCustomMethod(string \$param1): string
+    {
+        return \$param1;
+    }
+CODE;
+    }
+
+    private function buildMethod2(): string
+    {
+        return <<<CODE
+    public function someOtherCustomMethod(): string
+    {
+        return \$this->id;
+    }
+CODE;
     }
 }
