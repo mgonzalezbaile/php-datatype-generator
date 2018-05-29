@@ -49,8 +49,8 @@ class ComplexClassType extends ConventionCustomClass
     public function protectedAttrs(): array
     {
         return [
-            new AttributeDefinition('string', 'protectedAttr1', '"hello"'),
-            new AttributeDefinition('string', 'protectedAttr2', null),
+            new AttributeDefinition('protectedAttr1', 'string', false, false, '"hello"'),
+            new AttributeDefinition('protectedAttr2', 'string', false, false, null),
         ];
     }
 
@@ -73,9 +73,11 @@ class ComplexClassType extends ConventionCustomClass
     public function privateAttrs(): array
     {
         return [
-            new AttributeDefinition('string', 'privateAttr1', '"hello"'),
-            new AttributeDefinition('int', 'privateAttr2', '5'),
-            new AttributeDefinition('int', 'privateAttr3', null),
+            new AttributeDefinition('privateAttr1', 'string', false, false, '"hello"'),
+            new AttributeDefinition('privateAttr2', 'int', false, false, '5'),
+            new AttributeDefinition('privateAttr3', 'int', false, false, null),
+            new AttributeDefinition('nullablePrivateAttr4', 'int', true, false, null),
+            new AttributeDefinition('listPrivateAttr5', 'string', false, true, null),
         ];
     }
 

@@ -2,6 +2,7 @@
 
 namespace Mgonzalezbaile\Pdg\CustomClass;
 
+use Mgonzalezbaile\Pdg\Parser\Argument;
 use Mgonzalezbaile\Pdg\Parser\Constructor;
 
 abstract class ConventionCustomClass
@@ -149,35 +150,40 @@ CODE;
 
     private function attributesSection(Constructor $constructor, string $text): string
     {
-        foreach ($this->protectedAttrs() as $argument) {
-            $text .= "/**\n* @var " . $argument->type() . "\n*/\nprotected \$" . $argument->name();
-            if ($argument->hasDefaultValue()) {
-                $text .= " = " . $argument->defaultValue();
-            }
-            $text .= ";\n";
+        foreach ($this->protectedAttrs() as $protectedAttr) {
+            $text = $this->buildAttribute($text, $protectedAttr, 'protected');
         }
 
-        foreach ($this->privateAttrs() as $argument) {
-            $text .= "/**\n* @var " . $argument->type() . "\n*/\nprotected \$" . $argument->name();
-            if ($argument->hasDefaultValue()) {
-                $text .= " = " . $argument->defaultValue();
-            }
-            $text .= ";\n";
+        foreach ($this->privateAttrs() as $privateAttr) {
+            $text = $this->buildAttribute($text, $privateAttr, 'private');
         }
 
         //PRIVATE ATTRIBUTES FROM CONSTRUCTOR
         foreach ($constructor->arguments() as $argument) {
-            $text .= "/**\n* @var ";
-            if ($argument->isList()) {
-                $text .= $argument->type() . "[]";
-            } else {
-                $text .= $argument->type();
-            }
-            if ($argument->nullable()) {
-                $text .= "|null";
-            }
-            $text .= "\n*/\nprivate \$" . $argument->name() . ";\n";
+            $text = $this->buildAttribute($text, AttributeDefinition::fromArgument($argument), 'private');
         }
+
+        return $text;
+    }
+
+    private function buildAttribute(string $text, AttributeDefinition $argument, string $attributeType): string
+    {
+        $text .= "/**\n* @var ";
+        if ($argument->isList()) {
+            $text .= $argument->type() . "[]";
+        } else {
+            $text .= $argument->type();
+        }
+        if ($argument->nullable()) {
+            $text .= "|null";
+        }
+        $text .= "\n*/\n$attributeType \$" . $argument->name();
+
+        if ($argument->hasDefaultValue()) {
+            $text .= " = " . $argument->defaultValue();
+        }
+
+        $text .= ";\n";
 
         return $text;
     }
@@ -247,41 +253,62 @@ CODE;
     private function accessorsSection(Constructor $constructor, string $text): string
     {
         foreach ($constructor->arguments() as $argument) {
-            $text .= "public function " . $argument->name() . "(): ";
-            if ($argument->nullable()) {
-                $text .= "?";
-            }
-            if ($argument->isList()) {
-                $text .= "array";
-            } else {
-                $text .= $argument->type();
-            }
-            $text .= "\n{";
-            $text .= "return \$this->" . $argument->name() . ";\n";
-            $text .= "}\n";
+            $text = $this->buildAccessor($text, $argument);
+        }
+
+        foreach ($this->privateAttrs() as $privateAttr) {
+            $text = $this->buildAccessor($text, $privateAttr);
         }
 
         return $text;
     }
 
+    private function buildAccessor(string $text, Argument $argument): string
+    {
+        $text .= "public function " . $argument->name() . "(): ";
+        if ($argument->nullable()) {
+            $text .= "?";
+        }
+        if ($argument->isList()) {
+            $text .= "array";
+        } else {
+            $text .= $argument->type();
+        }
+        $text .= "\n{";
+        $text .= "return \$this->" . $argument->name() . ";\n";
+        $text .= "}\n";
+
+        return $text;
+    }
 
     private function settersSection(Constructor $constructor, string $text): string
     {
         foreach ($constructor->arguments() as $argument) {
-            $text .= "public function with" . ucfirst($argument->name()) . "(";
-            if ($argument->nullable()) {
-                $text .= "?";
-            }
-            if ($argument->isList()) {
-                $text .= "array";
-            } else {
-                $text .= $argument->type();
-            }
-            $text .= " $" . $argument->name() . "): self\n{";
-            $text .= "\$new = clone \$this;";
-            $text .= "\$this->" . $argument->name() . " = $" . $argument->name() . ";\n";
-            $text .= "return \$new;\n}\n";
+            $text = $this->buildSetter($text, $argument);
         }
+
+        foreach ($this->privateAttrs() as $privateAttr) {
+            $text = $this->buildSetter($text, $privateAttr);
+        }
+
+        return $text;
+    }
+
+    private function buildSetter(string $text, Argument $argument): string
+    {
+        $text .= "public function with" . ucfirst($argument->name()) . "(";
+        if ($argument->nullable()) {
+            $text .= "?";
+        }
+        if ($argument->isList()) {
+            $text .= "array";
+        } else {
+            $text .= $argument->type();
+        }
+        $text .= " $" . $argument->name() . "): self\n{";
+        $text .= "\$new = clone \$this;";
+        $text .= "\$this->" . $argument->name() . " = $" . $argument->name() . ";\n";
+        $text .= "return \$new;\n}\n";
 
         return $text;
     }

@@ -2,45 +2,30 @@
 
 namespace Mgonzalezbaile\Pdg\CustomClass;
 
-class AttributeDefinition
+use Mgonzalezbaile\Pdg\Parser\Argument;
+
+class AttributeDefinition extends Argument
 {
-    /**
-     * @var string
-     */
-    private $type;
-
-    /**
-     * @var string
-     */
-    private $name;
-
     /**
      * @var null|string
      */
     private $defaultValue;
 
-    public function __construct(string $type, string $name, ?string $defaultValue)
+    public static function fromArgument(Argument $argument)
     {
-        $this->type         = $type;
-        $this->name         = $name;
+        return new self($argument->name(), $argument->type(), $argument->nullable(), $argument->isList(), null);
+    }
+
+    public function __construct(string $name, string $type, bool $isNullable, bool $isList, ?string $defaultValue)
+    {
         $this->defaultValue = $defaultValue;
-    }
-
-    public function type(): string
-    {
-        return $this->type;
-    }
-
-    public function name(): string
-    {
-        return $this->name;
+        parent::__construct($name, $type, $isNullable, $isList);
     }
 
     public function defaultValue(): ?string
     {
         return $this->defaultValue;
     }
-
     public function hasDefaultValue(): bool
     {
         return $this->defaultValue !== null;
